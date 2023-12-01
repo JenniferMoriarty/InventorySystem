@@ -1,0 +1,158 @@
+def InventoryLoop():
+
+    import pygame
+
+    #Setup Main Display
+    pygame.init()
+    screen = pygame.display.set_mode((800, 800))
+    pygame.display.set_caption('InventoryShop')
+ 
+    clock = pygame.time.Clock()
+    running = True
+
+    inventory = ["ExampleItem1","ExampleItem2","ExampleItem3","ExampleItem4","ExampleItem5","ExampleItem6","Item 2"]
+
+    inspectingItem = False
+    class Item:
+        def __init__(self, xpos, ypos, itemName: str):
+            #Variable Setup
+            self.xpos = xpos
+            self.ypos = ypos
+            self.itemName = itemName
+            self.inventoryFrame = pygame.image.load("SystemAssets\\ItemFrame.png").convert_alpha()
+        def draw(self):
+            #drawing the frame
+
+            screen.blit(self.inventoryFrame, (self.xpos, self.ypos))
+
+            fontObj = pygame.font.Font('freesansbold.ttf', 12)
+            textSufaceObj = fontObj.render(self.itemName, True, ((0,0,0)), None) 
+            screen.blit(textSufaceObj, (self.xpos + 15,self.ypos + 50))
+        def hover(self, RClicked, mouse_pos):
+
+        
+            if (mouse_pos[0] < self.xpos + 100 and mouse_pos[0] > self.xpos and mouse_pos[1] < self.ypos + 100 and mouse_pos[1] > self.ypos):
+                if RClicked == True:
+                    print("e")
+                    return True
+                else:
+                    return False
+            else:
+                return False
+    
+        def inspecting(self,xpos, ypos, Lclicked, mouse_pos):
+            Equip = pygame.image.load("SystemAssets\\Equip.png").convert_alpha()
+            screen.blit(Equip, (xpos, ypos))
+
+            Remove = pygame.image.load("SystemAssets\\Delete.png").convert_alpha()
+            screen.blit(Remove, (xpos, ypos+22))
+
+            Cancel = pygame.image.load("SystemAssets\\Cancel.png").convert_alpha()
+            screen.blit(Cancel, (xpos, ypos + 44))
+        
+
+            if Lclicked == True:
+                print("Clicked")
+                if mouse_pos[0] < xpos + 95 and mouse_pos[0] >= xpos and mouse_pos[1] < ypos + 22 and mouse_pos[1] >= ypos:
+                    return "Equipped"
+                elif mouse_pos[0] < xpos + 95 and mouse_pos[0] >= xpos and mouse_pos[1] < ypos + 44 and mouse_pos[1] >= ypos:
+                    return "Delete"
+                elif mouse_pos[0] < xpos + 95 and mouse_pos[0] >= xpos and mouse_pos[1] < ypos + 66 and mouse_pos[1] >= ypos:
+                    return "Cancel"
+        def remove(self):
+            inventory.remove(self.itemName)
+    leftClicked = False
+    rightClicked = False
+
+    xposTemp = 0
+    yposTemp = 0
+    CurrentlyInspecting = False
+    while running == True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+       
+        left, middle, right = pygame.mouse.get_pressed()
+        mouse_pos = pygame.mouse.get_pos()
+        if left:
+            leftClicked = True
+        if right and CurrentlyInspecting == False:
+            rightClicked = True
+        #Fill screen
+        screen.fill("black")
+
+        #Add Inventory Screen
+        inventoryFrame = pygame.image.load("SystemAssets\\InventorySprite.png").convert_alpha()
+ 
+        #Put Inventory UI onto the screen
+        screen.blit(inventoryFrame, (150, 75))
+
+        #Add Frames
+        counter = 0
+        FrameRowypos = 180
+        cd = 0
+        toRemove: list[Item] = []
+        for i in range(len(inventory)):
+            counter += 1
+            if counter == 1:
+                frame = Item(215 - 15,FrameRowypos, inventory[i])
+                frame.draw()
+                if CurrentlyInspecting == False:
+                    CurrentlyInspecting = frame.hover(rightClicked, mouse_pos)
+                    if CurrentlyInspecting == True:
+                        xposTemp = mouse_pos[0]
+                        yposTemp = mouse_pos[1]
+
+
+
+
+                else:
+                    option = frame.inspecting(xposTemp, yposTemp, leftClicked, mouse_pos)
+                    if option == "Cancel":
+                        CurrentlyInspecting = False
+                    elif option == "Delete":
+                        toRemove.append(frame)
+                        CurrentlyInspecting = False
+            elif counter == 2:
+                frame = Item(340 - 15,FrameRowypos, inventory[i])
+                frame.draw()
+                if CurrentlyInspecting == False:
+                    CurrentlyInspecting = frame.hover(rightClicked, mouse_pos)
+                    if CurrentlyInspecting == True:
+                        xposTemp = mouse_pos[0]
+                        yposTemp = mouse_pos[1]
+                    
+                else:
+                    option = frame.inspecting(xposTemp, yposTemp, leftClicked, mouse_pos)
+                    if option == "Cancel":
+                        CurrentlyInspecting = False
+                    elif option == "Delete":
+                        toRemove.append(frame)
+                        CurrentlyInspecting = False
+            elif counter == 3:
+                frame = Item(465 - 15,FrameRowypos, inventory[i])
+                frame.draw()
+                if CurrentlyInspecting == False:
+                    CurrentlyInspecting = frame.hover(rightClicked, mouse_pos)
+                    if CurrentlyInspecting == True:
+                        xposTemp = mouse_pos[0]
+                        yposTemp = mouse_pos[1]
+                    
+                else:
+                    option = frame.inspecting(xposTemp, yposTemp, leftClicked, mouse_pos)
+                    if option == "Cancel":
+                        CurrentlyInspecting = False
+                    elif option == "Delete":
+                        toRemove.append(frame)
+                        CurrentlyInspecting = False
+                counter = 0
+                FrameRowypos += 125
+
+        for frame in toRemove:
+            frame.remove()
+            
+        pygame.display.flip()
+        leftClicked = False
+        rightClicked = False
+        clock.tick(60) 
+InventoryLoop()
